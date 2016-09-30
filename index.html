@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+
+<script src="jquery-3.1.0.min.js"></script>
+<script src="echarts-all.js"></script>
+
+<body>
+<div id="main" style="height:400px"></div>
+
+<script language="JavaScript">
+    $(document).ready(function () {
+        var myChart =  echarts.init(document.getElementById('main'));
+
+        var option = {
+            title: {
+                text: 'api接口实时数据',
+                subtext: '/v1/nearby/index'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['曲线一', '曲线二']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'line']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            dataZoom: {
+                show: false,
+                start: 0,
+                end: 100
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    splitLine: {show: true},  //去除x轴网格线
+                    boundaryGap: true,
+                    data: (function () {
+                        var now = new Date();
+                        var res = [];
+                        var len = 100;
+                        while (len--) {
+                            res.unshift(now.toLocaleTimeString().replace(/^\D*/, ''));
+                            now = new Date(now - 2000);
+                        }
+                        return res;
+                    })()
+                },
+                {
+                    type: 'category',
+                    splitLine: {show: false},  //去除x轴网格线
+                    boundaryGap: true,
+                    data: (function () {
+                        var res = [];
+                        var len = 100;
+                        while (len--) {
+                            res.push(len + 1);
+                        }
+                        return res;
+                    })()
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    splitLine: {show: false},  //去除y轴网格线
+                    scale: true,
+                    name: 'Y轴左',
+                    boundaryGap: [0.2, 0.2]
+                },
+                {
+                    type: 'value',
+                    splitLine: {show: false},  //去除y轴网格线
+                    scale: true,
+                    name: 'Y轴右',
+                    boundaryGap: [0.2, 0.2]
+                }
+            ],
+            series: [
+                {
+                    name: '曲线二',
+                    type: 'line',
+                    xAxisIndex: 1,
+                    yAxisIndex: 1,
+                    data: (function () {
+                        var res = [];
+                        var len = 100;
+                        while (len--) {
+                            res.push(Math.round(Math.random() * 1000));
+                        }
+                        return res;
+                    })()
+                },
+                {
+                    name: '曲线一',
+                    type: 'line',
+                    data: (function () {
+                        var res = [];
+                        var len = 100;
+                        while (len--) {
+                            res.push((Math.random() * 10 + 5).toFixed(1) - 0);
+                        }
+                        return res;
+                    })()
+                }
+            ]
+        };
+
+        myChart.setOption(option);
+
+        var axisData;
+        timeTicket = setInterval(function () {
+            $.ajax({
+                url:"http://localhost/real-time/server.php",
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var lastData = arr.a;
+                    var lastData2 = arr.b;
+
+//                    lastData += Math.random() * ((Math.round(Math.random() * 10) % 2) == 0 ? 1 : -1);
+//                    lastData = lastData.toFixed(1) - 0;
+//                    lastData2 += Math.random() * ((Math.round(Math.random() * 10) % 2) == 0 ? 1 : -1);
+//                    lastData2 = lastData.toFixed(1) - 0;
+                    axisData = (new Date()).toLocaleTimeString().replace(/^\D*/, '');
+
+                    myChart.addData([
+                        [
+                            0,        // 系列索引
+                            lastData2,
+                            false,    // 新增数据是否从队列头部插入
+                            false     // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+                        ],
+                        [
+                            1,        // 系列索引
+                            lastData, // 新增数据
+                            false,    // 新增数据是否从队列头部插入
+                            false,    // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+                            axisData  // 坐标轴标签
+                        ]
+                    ]);
+                }
+            });
+
+        }, 4000);
+
+    });
+</script>
+</body>

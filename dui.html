@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+
+<script src="jquery-3.1.0.min.js"></script>
+<script src="echarts-all.js"></script>
+
+<body>
+<div id="echart_line" style="height:350px;"></div>
+
+
+<script language="JavaScript">
+    $(document).ready(function () {
+        var myChart = echarts.init(document.getElementById('echart_line'));
+        myChart.setOption({
+            title: {
+                text: 'api接口实时数据',
+                subtext: '/v1/nearby/index'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['总平均时间', 'moa平均时间', 'redis平均时间']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['line', 'bar', 'stack', 'tiled']
+                    },
+                    restore: {
+                        show: true
+                    },
+                    saveAsImage: {
+                        show: true
+                    }
+                }
+            },
+            calculable: true,
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }],
+            yAxis: [{
+                type: 'value'
+            }],
+            series: [{
+                name: '总平均时间',
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: [10, 12, 21, 54, 260, 830, 710]
+            }, {
+                name: 'moa平均时间',
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: [30, 182, 434, 791, 390, 30, 10]
+            }, {
+                name: 'redis平均时间',
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: [1320, 1132, 601, 234, 120, 90, 20]
+            }]
+        });
+
+        var axisData;
+        setInterval(function () {
+            $.ajax({
+                url:"http://localhost/real-time/server.php",
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var lastData1 = arr.a;
+                    var lastData2 = arr.b;
+                    var lastData3 = arr.c;
+
+                    axisData = (new Date()).toLocaleTimeString().replace(/^\D*/, '');
+
+                    myChart.addData([
+                        [
+                            0,        // 系列索引
+                            lastData1,
+                            false,    // 新增数据是否从队列头部插入
+                            false     // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+                        ],
+                        [
+                            1,        // 系列索引
+                            lastData2, // 新增数据
+                            false,    // 新增数据是否从队列头部插入
+                            false,    // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+                            axisData  // 坐标轴标签
+                        ],
+                        [
+                            2,        // 系列索引
+                            lastData3, // 新增数据
+                            false,    // 新增数据是否从队列头部插入
+                            false,    // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+                            axisData  // 坐标轴标签
+                        ]
+                    ]);
+                }
+            });
+
+        }, 60000);
+
+    });
+</script>
+</body>
