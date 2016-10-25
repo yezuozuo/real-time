@@ -4,8 +4,8 @@
     <title>ECharts</title>
 </head>
 
-<script src="jquery-3.1.0.min.js"></script>
-<script src="echarts-all.js"></script>
+<script src="../js/jquery-3.1.0.min.js"></script>
+<script src="../js/echarts-all.js"></script>
 
 <body>
 <div id="main" style="height:400px"></div>
@@ -121,7 +121,7 @@
         var axisData;
         timeTicket = setInterval(function () {
             $.ajax({
-                url:"http://localhost/real-time/server.php",
+                url:"http://localhost/real-time/src/server.php",
                 success: function (data) {
                     var arr = JSON.parse(data);
                     var lastData = arr.a;

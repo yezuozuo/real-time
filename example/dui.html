@@ -4,8 +4,8 @@
     <title>ECharts</title>
 </head>
 
-<script src="jquery-3.1.0.min.js"></script>
-<script src="echarts-all.js"></script>
+<script src="../js/jquery-3.1.0.min.js"></script>
+<script src="../js/echarts-all.js"></script>
 
 <body>
 <div id="echart_line" style="height:350px;"></div>
@@ -91,7 +91,7 @@
         var axisData;
         setInterval(function () {
             $.ajax({
-                url:"http://localhost/real-time/server.php",
+                url:"http://localhost/real-time/src/server.php",
                 success: function (data) {
                     var arr = JSON.parse(data);
                     var lastData1 = arr.a;
@@ -125,7 +125,7 @@
                 }
             });
 
-        }, 60000);
+        }, 4000);
 
     });
 </script>
